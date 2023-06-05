@@ -81,18 +81,8 @@ function processAllPromises(array) {
  *    })
  *
  */
-function getFastestPromise(/* array */) {
-  // const fastestPromise = Promise.race(array);
-  // return fastestPromise
-  //   .then(() => Promise.all(array.map((p) => {
-  //     if (p !== fastestPromise) {
-  //       return p.then(() => undefined);
-  //     }
-  //     return p;
-  //   })))
-  //   .then(() => [fastestPromise])
-  //   .catch((error) => Promise.reject(error));
-  throw new Error('Not implemented');
+function getFastestPromise(array) {
+  return Promise.race(array);
 }
 
 /**

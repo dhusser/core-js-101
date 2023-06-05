@@ -122,35 +122,55 @@ function fromJSON(proto, json) {
  */
 
 const cssSelectorBuilder = {
-  element(/* value */) {
-    throw new Error('Not implemented');
+  complexSelector: '',
+  currentSelectorId: null,
+  noDuplicateIds: [1, 2, 6],
+
+  checkOrder(id) {
+    if (id < this.currentSelectorId) {
+      throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    } else if (id === this.currentSelectorId && this.noDuplicateIds.includes(id)) {
+      throw new Error('Element, id and pseudo-element should not occur more then one time inside the selector');
+    }
+    return id;
   },
 
-  id(/* value */) {
-    throw new Error('Not implemented');
+  addToComplexSelector(value, id) {
+    return { ...this, complexSelector: `${this.complexSelector}${value}`, currentSelectorId: this.checkOrder(id) };
   },
 
-  class(/* value */) {
-    throw new Error('Not implemented');
+  element(value) {
+    return this.addToComplexSelector(value, 1);
   },
 
-  attr(/* value */) {
-    throw new Error('Not implemented');
+  id(value) {
+    return this.addToComplexSelector(`#${value}`, 2);
   },
 
-  pseudoClass(/* value */) {
-    throw new Error('Not implemented');
+  class(value) {
+    return this.addToComplexSelector(`.${value}`, 3);
   },
 
-  pseudoElement(/* value */) {
-    throw new Error('Not implemented');
+  attr(value) {
+    return this.addToComplexSelector(`[${value}]`, 4);
   },
 
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
+  pseudoClass(value) {
+    return this.addToComplexSelector(`:${value}`, 5);
+  },
+
+  pseudoElement(value) {
+    return this.addToComplexSelector(`::${value}`, 6);
+  },
+
+  combine(group1, combinator, group2) {
+    return { ...this, complexSelector: `${group1.complexSelector} ${combinator} ${group2.complexSelector}` };
+  },
+
+  stringify() {
+    return this.complexSelector;
   },
 };
-
 
 module.exports = {
   Rectangle,
